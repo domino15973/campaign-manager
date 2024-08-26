@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 @Table(name = "campaigns")
@@ -25,9 +26,11 @@ public class Campaign {
     @Column(nullable = false)
     private String name;
 
-    @NotBlank(message = "Keywords are mandatory")
-    @Column(nullable = false)
-    private String keywords;
+    @ElementCollection
+    @CollectionTable(name = "campaign_keywords", joinColumns = @JoinColumn(name = "campaign_id"))
+    @Column(name = "keyword", nullable = false)
+    @NotEmpty(message = "Keywords are mandatory")
+    private List<String> keywords;
 
     @DecimalMin(value = "1.00", message = "Bid amount must be at least 1.00")
     @Column(nullable = false)
