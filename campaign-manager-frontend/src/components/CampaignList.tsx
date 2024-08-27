@@ -45,9 +45,9 @@ const CampaignList: React.FC = () => {
   };
 
   return (
-    <div>
-      <h1>Balance: ${balance.toFixed(2)}</h1>
-      <button onClick={() => openModal(null)}>Create Campaign</button>
+    <div className="container">
+      <div className="balance">Balance: ${balance.toFixed(2)}</div>
+      <button className="create-button" onClick={() => openModal(null)}>Create Campaign</button>
       <ul>
         {campaigns.map(campaign => (
           <CampaignItem
