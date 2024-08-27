@@ -1,8 +1,9 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Campaign, createCampaign, updateCampaign} from '../services/campaignService';
 import AsyncSelect from 'react-select/async';
 import {getTowns} from '../services/townService';
 import {getKeywords} from '../services/keywordService';
+import {getBalance} from '../services/balanceService';
 
 interface CampaignFormProps {
     campaign: Campaign | null;
@@ -10,6 +11,16 @@ interface CampaignFormProps {
 }
 
 const CampaignForm: React.FC<CampaignFormProps> = ({campaign, onClose}) => {
+    const [balance, setBalance] = useState<number>(0);
+
+    useEffect(() => {
+        const fetchBalance = async () => {
+            const fetchedBalance = await getBalance();
+            setBalance(fetchedBalance);
+        };
+        fetchBalance().then();
+    }, []);
+
     const [formData, setFormData] = useState({
         name: campaign?.name || '',
         keywords: campaign?.keywords || [],
@@ -33,6 +44,12 @@ const CampaignForm: React.FC<CampaignFormProps> = ({campaign, onClose}) => {
             setFormData(prevData => ({
                 ...prevData,
                 status: value === 'true',
+            }));
+        } else if (name === 'campaignFund') {
+            const fundValue = Math.min(Number(value), balance);
+            setFormData(prevData => ({
+                ...prevData,
+                campaignFund: fundValue,
             }));
         } else {
             setFormData(prevData => ({
@@ -125,14 +142,15 @@ const CampaignForm: React.FC<CampaignFormProps> = ({campaign, onClose}) => {
                 />
             </label>
             <label>
-                Campaign Fund:
+                Campaign Fund (Max: ${balance}):
                 <input
                     type="number"
                     name="campaignFund"
                     value={formData.campaignFund}
                     onChange={handleChange}
                     required
-                    min="1"
+                    min="0"
+                    max={balance}
                 />
             </label>
             <label>
